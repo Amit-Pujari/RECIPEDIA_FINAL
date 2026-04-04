@@ -3,30 +3,34 @@
 /* General Responsive Styles */
 @media (max-width: 1024px) {
     .home {
-      flex-direction: column;
+      grid-template-columns: 1fr;
       gap: 3rem;
-      align-items: center;
       text-align: center;
     }
   
     .home .right img {
-      width: 250px;
+      width: min(80vw, 300px);
       height: auto;
+    }
+
+    header ul {
+      gap: 1.5rem;
     }
   }
   
-  @media (max-width: 768px) {
-    header {
-      flex-direction: column;
-      height: auto;
-      padding: 10px;
-      text-align: center;
+@media (max-width: 768px) {
+    .hamburger {
+      display: flex;
     }
-  
+
     header ul {
-      width: 100%;
-      flex-direction: column;
-      gap: 10px;
+      display: none;
+    }
+
+    header {
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 1rem;
     }
   
     .home {

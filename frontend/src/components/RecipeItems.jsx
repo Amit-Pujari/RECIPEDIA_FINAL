@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useLoaderData, useNavigate } from 'react-router-dom'
 import foodRecipe from '../assets/foodRecipe.png'
-import { BsStopwatchFill } from "react-icons/bs";
-import { FaHeart } from "react-icons/fa6";
-import { FaEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
+import { Clock, Heart, Edit, Trash2 } from 'lucide-react';
 import axios from 'axios';
 
 export default function RecipeItems() {
@@ -46,12 +43,11 @@ export default function RecipeItems() {
                                 <div className='card-body'>
                                     <div className='title'>{item.title}</div>
                                     <div className='icons'>
-                                        <div className='timer'><BsStopwatchFill />{item.time}</div>
-                                        {(!path) ? <FaHeart onClick={() => favRecipe(item)}
-                                            style={{ color: (favItems.some(res => res._id === item._id)) ? "red" : "" }} /> :
+                                        <div className='timer'><Clock className="icon-sm" /> {item.time}</div>
+                                        {(!path) ? <Heart className={`icon-sm ${favItems.some(res => res._id === item._id) ? 'text-red-500' : ''}`} onClick={() => favRecipe(item)} /> :
                                             <div className='action'>
-                                                <Link to={`/editRecipe/${item._id}`} className="editIcon"><FaEdit /></Link>
-                                                <MdDelete onClick={() => onDelete(item._id)} className='deleteIcon' />
+                                                <Link to={`/editRecipe/${item._id}`} className="editIcon"><Edit className="icon-sm" /></Link>
+                                                <Trash2 className="icon-sm text-red-500 deleteIcon" onClick={() => onDelete(item._id)} />
                                             </div>
                                         }
                                     </div>
