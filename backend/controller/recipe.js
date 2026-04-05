@@ -19,7 +19,7 @@ const getRecipes = async(req,res) => {
 }
 
 const getRecipe = async(req,res) => {
-    const recipe = await Recipes.findById(req.params.id)
+    const recipe = await Recipes.findById(req.params.id).populate('createdBy', 'email username name').populate('comments.user', 'email username name')
     res.json(recipe)
 }
 
@@ -65,4 +65,44 @@ const deleteRecipe = async(req,res) => {
     }
 }
 
-module.exports={getRecipes, getRecipe, addRecipe, editRecipe, deleteRecipe, upload}
+const getComments = async (req, res) => {
+    const recipe = await Recipes.findById(req.params.id).populate('comments.user', 'email username')
+    if (!recipe) {
+        return res.status(404).json({ message: 'Recipe not found' })
+    }
+    res.json(recipe.comments)
+}
+
+const addComment = async (req, res) => {
+    const { text } = req.body
+    if (!text || text.trim().length === 0) {
+        return res.status(400).json({ message: 'Review text is required' })
+    }
+    const recipe = await Recipes.findByIdAndUpdate(
+        req.params.id,
+        {
+            $push: {
+                comments: {
+                    user: req.user ? req.user.id : null,
+                    text: text.trim()
+                }
+            }
+        },
+        { new: true }
+    ).populate('comments.user', 'email username')
+    if (!recipe) {
+        return res.status(404).json({ message: 'Recipe not found' })
+    }
+    res.json(recipe.comments)
+}
+
+module.exports = {
+    getRecipes,
+    getRecipe,
+    addRecipe,
+    editRecipe,
+    deleteRecipe,
+    upload,
+    getComments,
+    addComment
+}

@@ -3,20 +3,24 @@ const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 
 const userSignUp = async (req, res) => {
-    const { email, password } = req.body
-    if (!email || !password) {
-        return res.status(400).json({ message: "Email and password is required" })
+    const { email, password, username } = req.body
+    if (!email || !password || !username) {
+        return res.status(400).json({ message: "Email, username and password are required" })
     }
     let user = await User.findOne({ email })
     if (user) {
-        return res.status(400).json({ error: "Email is already exist" })
+        return res.status(400).json({ error: "Email already exists" })
+    }
+    let existingUsername = await User.findOne({ username })
+    if (existingUsername) {
+        return res.status(400).json({ error: "Username already taken" })
     }
     const hashPwd = await bcrypt.hash(password, 10)
     const newUser = await User.create({
-        email, password: hashPwd
+        email, username, password: hashPwd
     })
-    let token = jwt.sign({ email, id: newUser._id }, process.env.SECRET_KEY)
-    return res.status(200).json({ token, user:newUser })
+    let token = jwt.sign({ email, username, id: newUser._id }, process.env.SECRET_KEY)
+    return res.status(200).json({ token, user: newUser })
 
 }
 
@@ -36,8 +40,9 @@ const userLogin = async (req, res) => {
 }
 
 const getUser = async (req, res) => {
-    const user = await User.findById(req.params.id)
-    res.json({email:user.email})
+    const user = await User.findById(req.params.id).select('email username')
+    if (!user) return res.status(404).json({ message: 'User not found' })
+    res.json({email: user.email, name: user.username || user.email.split('@')[0] })
 }
 
 module.exports = { userLogin, userSignUp, getUser }
